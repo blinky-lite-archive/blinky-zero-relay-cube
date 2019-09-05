@@ -53,13 +53,6 @@ void loop()
     readings.milliAmps = (readings.rawRms -settings.rmsOffset) / settings.adcTomA;
     readings.power = readings.milliAmps * 0.0001 * settings.acVolts;
     readings.sampleRate = icount;
-/*
-    Serial.print(readings.sampleRate);
-    Serial.print(", ");
-    Serial.print(readings.rawRms);
-    Serial.print(", ");
-    Serial.println(readings.power);
-*/
     icount = 0;
     tstart = now;
   }
@@ -70,6 +63,21 @@ void loop()
   while(Serial1.available() > 0)
   {
     Serial1.readBytes((uint8_t*) &settings, sizeof(settings));
+    
+    Serial.print("Settings: ");
+    Serial.print(settings.echoReadings);
+    Serial.print(", ");
+    Serial.print(settings.numSamplesAvg);
+    Serial.print(", ");
+    Serial.print(settings.numSamplesFilter);
+    Serial.print(", ");
+    Serial.print(settings.numSamplesRms);
+    Serial.print(", ");
+    Serial.print(settings.adcTomA);
+    Serial.print(", ");
+    Serial.print(settings.rmsOffset);
+    Serial.print(", ");
+    Serial.println(settings.acVolts);
   }
   adcValue = (float) analogRead(readPin0);
   adcFilter = adcFilter + (adcValue - adcFilter) / settings.numSamplesFilter;
@@ -87,5 +95,15 @@ void loop()
     digitalWrite(led13Pin, led13);
     Serial1.write((uint8_t*)&readings, sizeof(readings));
     settings.echoReadings = 0;
+
+    Serial.print("Readings: ");
+    Serial.print(readings.milliAmps);
+    Serial.print(", ");
+    Serial.print(readings.power);
+    Serial.print(", ");
+    Serial.print(readings.sampleRate);
+    Serial.print(", ");
+    Serial.println(readings.rawRms);
+
   }
 }
