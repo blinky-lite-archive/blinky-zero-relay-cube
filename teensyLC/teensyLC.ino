@@ -1,6 +1,6 @@
 const int led13Pin = 13;
 
-boolean led13 = false;
+boolean led13 = true;
 const int readPin0 = A0; // ADC0
 
 struct Readings
@@ -40,8 +40,9 @@ void setup()
 //  analogReadAveraging(8);    
   
   pinMode(readPin0, INPUT); 
-    
+  pinMode(led13Pin, OUTPUT); 
   digitalWrite(led13Pin, led13);
+    
 }
 
 void loop()
@@ -49,9 +50,6 @@ void loop()
   now = millis();
   if ((now - tstart) >= 1000)
   {
-    readings.rawRms = sqrt(avgRms);
-    readings.milliAmps = (readings.rawRms -settings.rmsOffset) / settings.adcTomA;
-    readings.power = readings.milliAmps * 0.0001 * settings.acVolts;
     readings.sampleRate = icount;
     icount = 0;
     tstart = now;
@@ -63,7 +61,7 @@ void loop()
   while(Serial1.available() > 0)
   {
     Serial1.readBytes((uint8_t*) &settings, sizeof(settings));
-    
+/*    
     Serial.print("Settings: ");
     Serial.print(settings.echoReadings);
     Serial.print(", ");
@@ -78,6 +76,7 @@ void loop()
     Serial.print(settings.rmsOffset);
     Serial.print(", ");
     Serial.println(settings.acVolts);
+*/
   }
   adcValue = (float) analogRead(readPin0);
   adcFilter = adcFilter + (adcValue - adcFilter) / settings.numSamplesFilter;
@@ -88,14 +87,13 @@ void loop()
   if (settings.echoReadings > 0)
   {
     readings.rawRms = sqrt(avgRms);
-    readings.milliAmps = (readings.rawRms -settings.rmsOffset) / settings.adcTomA;
-    readings.power = readings.milliAmps * 0.0001 * settings.acVolts;
-    readings.sampleRate = icount;
+    readings.milliAmps = (readings.rawRms - settings.rmsOffset) / settings.adcTomA;
+    readings.power = readings.milliAmps * 0.001 * settings.acVolts;
     led13 = !led13;
     digitalWrite(led13Pin, led13);
     Serial1.write((uint8_t*)&readings, sizeof(readings));
     settings.echoReadings = 0;
-
+/*
     Serial.print("Readings: ");
     Serial.print(readings.milliAmps);
     Serial.print(", ");
@@ -104,6 +102,7 @@ void loop()
     Serial.print(readings.sampleRate);
     Serial.print(", ");
     Serial.println(readings.rawRms);
+*/
 
   }
 }
